@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>银龄健身 · 康复锻炼</title>
+  <meta name="description" content="专为长辈设计的康复锻炼 APP：抗阻训练、日常锻炼、中医按摩，视频短、可循环、带跟练口令。" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#4a7c59" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="银龄健身" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="logo-slot" href="#top" aria-label="银龄健身 LOGO">
+        <img class="logo-img" src="logo.png" alt="银龄健身" />
+      </a>
+      <div class="topbar__title">
+        <strong>银龄健身</strong>
+        <span>康复锻炼 · 天天好精神</span>
+      </div>
+      <div class="topbar__right">
+        <div class="today-badge" title="今日累计锻炼时长">
+          <span class="today-badge__num" id="todayMinutes">0</span>
+          <span class="today-badge__unit">分钟</span>
+        </div>
+        <button class="icon-btn" id="helpBtn" aria-label="使用说明">说明</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section class="hero">
+      <h1 class="hero__title">动一动，身体更轻松</h1>
+      <p class="hero__sub">
+        这里的动作都<strong>适合长辈</strong>：弹力带抗阻、八段锦、太极、五禽戏、经络拍打等，
+        多是<strong>坐着练、不跑跳</strong>，抗阻只需<strong>一根弹力带</strong>在家就能做，温和护关节。每个视频都配了跟练口令和节拍，跟着做就行，
+        可循环播放，随时暂停、退出。每天练一练，慢慢见成效。
+      </p>
+      <button class="btn btn--ghost btn--lg" id="helpBtn2">怎么用？看说明</button>
+    </section>
+
+    <nav class="tabs" id="tabs" aria-label="锻炼分类"></nav>
+    <div class="chips" id="chips" aria-label="子分类"></div>
+
+    <section class="grid" id="list" aria-live="polite"></section>
+
+    <section class="calendar">
+      <div class="calendar__head">
+        <h2>本月锻炼日历</h2>
+        <div class="calendar__nav">
+          <button class="icon-btn" id="prevMonth" aria-label="上个月">‹</button>
+          <span id="monthLabel" class="calendar__label">—</span>
+          <button class="icon-btn" id="nextMonth" aria-label="下个月">›</button>
+        </div>
+      </div>
+      <p class="calendar__hint">有颜色的小格代表当天练过，数字是多少分钟。</p>
+      <div class="calendar__grid" id="calGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer container">
+    <p>银龄健身 · 手机版 — 视频已压缩优化，适合移动网络。锻炼量力而行，不适即停。</p>
+  </footer>
+
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-label="使用说明">
+      <button class="modal__close" data-close aria-label="关闭">&times;</button>
+      <h2>使用说明</h2>
+      <ol class="help-list">
+        <li><b>选分类：</b>顶部「抗阻训练 / 日常锻炼 / 中医按摩」三个大类任选。抗阻训练用<strong>一根弹力带</strong>、以坐姿为主，在家就能方便练。</li>
+        <li><b>挑视频：</b>点下面的卡片，打开就能跟着练。视频都不长，可循环。</li>
+        <li><b>跟着口令做：</b>画面会显示大字<strong>跟练口令</strong>，并有节拍提示，照着做即可。</li>
+        <li><b>控制：</b>想歇会儿点「暂停」，接着点「继续」；不想练了点「退出」返回。</li>
+        <li><b>看记录：</b>顶部显示<strong>今日几分钟</strong>，下面日历能看到每天练了多少。</li>
+      </ol>
+      <p class="help-tip">温馨提示：量力而行，动作缓慢，不舒服就停下休息。</p>
+    </div>
+  </div>
+
+  <div class="player" id="player" hidden>
+    <div class="player__backdrop" data-exit></div>
+    <div class="player__card" role="dialog" aria-modal="true" aria-label="锻炼播放">
+      <div class="player__bar">
+        <button class="player__exit" data-exit>&#8249; 退出</button>
+        <span class="player__name" id="playerName">锻炼</span>
+        <label class="loop-toggle">
+          <input type="checkbox" id="loopChk" checked /> <span>循环</span>
+        </label>
+      </div>
+      <div class="stage" id="stage">
+        <video id="video" playsinline webkit-playsinline></video>
+        <div class="stage__demo" id="stageDemo">
+          <div class="beat" id="beat" aria-hidden="true"></div>
+          <div class="cue" id="cue">准备开始</div>
+          <div class="cue-next" id="cueNext"></div>
+        </div>
+      </div>
+      <div class="player__progress">
+        <span id="curTime">0:00</span>
+        <input type="range" id="seek" min="0" max="100" value="0" aria-label="进度" />
+        <span id="durTime">0:00</span>
+      </div>
+      <div class="player__credit" id="playerCredit" hidden></div>
+      <div class="player__controls">
+        <button class="ctrl" id="playBtn">&#9654; 开始</button>
+        <button class="ctrl ctrl--link" id="watchLinkBtn" hidden>&#128279; 在B站看原视频</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=20260720"></script>
+
+  <!-- PWA Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>
